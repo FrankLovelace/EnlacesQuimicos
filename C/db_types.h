@@ -7,6 +7,7 @@
 typedef struct {
     char simbolo[MAX_SIMBOLO];
     char nombre[MAX_NOMBRE];
+    int numero_atomico;
 } ElementoInfo;
 
 #endif

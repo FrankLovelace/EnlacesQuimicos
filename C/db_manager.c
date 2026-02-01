@@ -14,7 +14,7 @@ int buscar_elemento(const char *simbolo_input, const char *ruta_db, ElementoInfo
         return 0;
     }
 
-    char linea[100];
+    char linea[150]; 
     char *token;
 
     while (fgets(linea, sizeof(linea), archivo)) {
@@ -27,18 +27,22 @@ int buscar_elemento(const char *simbolo_input, const char *ruta_db, ElementoInfo
                 strcpy(resultado->simbolo, token);
                 
                 token = strtok(NULL, ",");
+                if (token) strcpy(resultado->nombre, token);
+                else strcpy(resultado->nombre, "Desconocido");
+
+                token = strtok(NULL, ",");
                 if (token) {
-                    strcpy(resultado->nombre, token);
+                    resultado->numero_atomico = atoi(token); 
                 } else {
-                    strcpy(resultado->nombre, "Desconocido");
+                    resultado->numero_atomico = 0;
                 }
 
                 fclose(archivo);
-                return 1; 
+                return 1;
             }
         }
     }
 
     fclose(archivo);
-    return 0; 
+    return 0;
 }

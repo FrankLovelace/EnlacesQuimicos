@@ -15,20 +15,21 @@ int main() {
     if (scanf("%s", input_usuario) == 1) {
         
         if (buscar_elemento(input_usuario, ARCHIVO_DB, &elemento_encontrado)) {
-            printf("\nResultado:\n");
-            printf("Simbolo: %s\n", elemento_encontrado.simbolo);
-            printf("Nombre : %s\n", elemento_encontrado.nombre);
+            printf("\n--- Resultado ---\n");
+            printf("Simbolo       : %s\n", elemento_encontrado.simbolo);
+            printf("Nombre        : %s\n", elemento_encontrado.nombre);
+            printf("Numero Atomico: %d\n", elemento_encontrado.numero_atomico);
         } else {
-            printf("\nEl elemento '%s' no existe en %s o no fue encontrado.\n", input_usuario, ARCHIVO_DB);
+            printf("\nEl elemento '%s' no existe en %s.\n", input_usuario, ARCHIVO_DB);
         }
         
     } else {
         printf("Error al leer la entrada.\n");
     }
 
+    // Pausa
     while (getchar() != '\n');
-
-    printf("\nPresiona ENTER para cerrar el programa...");
+    printf("\nPresiona ENTER para cerrar...");
     getchar(); 
 
     return 0;
