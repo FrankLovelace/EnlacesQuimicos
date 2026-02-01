@@ -73,6 +73,11 @@ def procesar_archivo_elemento(ruta_filepath, mapa_afinidades, db_global):
     cargas_ordenadas = sorted(energias_por_carga.keys())
     
     for carga in cargas_ordenadas:
+        
+        if carga >= z_del_elemento:
+            continue
+        # --------------------------
+
         ie_actual = energias_por_carga[carga]
         
         if carga == 0:
@@ -95,12 +100,15 @@ def procesar_archivo_elemento(ruta_filepath, mapa_afinidades, db_global):
             "info_ea": metodo
         }
 
-    db_global[simbolo_del_elemento] = {
-        "Z": z_del_elemento,
-        "simbolo": simbolo_del_elemento,
-        "estados": estados_calculados
-    }
-    print(f"  [OK] {simbolo_del_elemento} (Z={z_del_elemento}) - {len(estados_calculados)} estados.")
+    if estados_calculados:
+        db_global[simbolo_del_elemento] = {
+            "Z": z_del_elemento,
+            "simbolo": simbolo_del_elemento,
+            "estados": estados_calculados
+        }
+        print(f"  [OK] {simbolo_del_elemento} (Z={z_del_elemento}) - {len(estados_calculados)} estados.")
+    else:
+        print(f"  [!] {simbolo_del_elemento} ignorado (Sin estados validos).")
 
 def main():
     print("--- PROCESAMIENTO ---")
