@@ -1,2 +1,3 @@
-Z,Elemento,Simbolo
-2,Helio,He
+At. num,Sp. Name,Ion Charge,El. Name,Isoel. Seq.,Ground Shells,Ground Level,Ionized Level,Prefix,Ionization Energy (eV),Suffix,Uncertainty (eV),References,
+"=""2""","=""He I""","=""0""","=""Helium""","=""He""","=""1s2""","=""1S0""","=""1s 2S<1/2>""","=""""","=""24.587389011""","=""""","=""0.000000025""","=""L17714""",
+"=""2""","=""He II""","=""+1""","=""Helium""","=""H""","=""1s""","=""2S<1/2>""","=""""","=""(""","=""54.4177655282""","="")""","=""0.0000000010""","=""L19200""",
