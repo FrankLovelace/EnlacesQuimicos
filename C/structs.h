@@ -13,7 +13,10 @@ typedef struct {
     char simbolo[5];
     double afinidad_neutra; 
     EstadoIonico estados[120]; 
-    int tiene_datos_carga[120];
+    int tiene_datos_carga[120]; 
 } AtomoData;
+
+int obtener_limite_capa(int Z);
+double obtener_mulliken_config(AtomoData *atomo, int num_electrones);
 
 #endif

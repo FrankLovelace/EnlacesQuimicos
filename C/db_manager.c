@@ -1,48 +1,57 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "db_types.h"
+#include "structs.h"
+#include "cJSON.h" 
 
-void limpiar_linea(char *str) {
-    str[strcspn(str, "\r\n")] = 0;
-}
+#define RUTA_JSON "data/base_datos_quimica_final.json"
 
-int buscar_elemento(const char *simbolo_input, const char *ruta_db, ElementoInfo *resultado) {
-    FILE *archivo = fopen(ruta_db, "r");
-    if (!archivo) {
-        printf("Error: No se pudo abrir la base de datos %s\n", ruta_db);
-        return 0;
+AtomoData* cargar_elemento_json(const char* simbolo_buscado) {
+    
+    FILE *fp = fopen(RUTA_JSON, "r");
+    if (!fp) {
+        printf("Error: No se encontro el JSON en %s\n", RUTA_JSON);
+        return NULL;
     }
 
-    char linea[150]; 
-    char *token;
+    fseek(fp, 0, SEEK_END);
+    long size = ftell(fp);
+    fseek(fp, 0, SEEK_SET);
+    char *buffer = malloc(size + 1);
+    fread(buffer, 1, size, fp);
+    fclose(fp);
+    buffer[size] = '\0';
 
-    while (fgets(linea, sizeof(linea), archivo)) {
-        limpiar_linea(linea);
+    cJSON *json = cJSON_Parse(buffer);
+    cJSON *elem_json = cJSON_GetObjectItemCaseSensitive(json, simbolo_buscado);
 
-        token = strtok(linea, ",");
-        
-        if (token != NULL) {
-            if (strcmp(token, simbolo_input) == 0) {
-                strcpy(resultado->simbolo, token);
-                
-                token = strtok(NULL, ",");
-                if (token) strcpy(resultado->nombre, token);
-                else strcpy(resultado->nombre, "Desconocido");
+    if (!elem_json) {
+        free(buffer);
+        cJSON_Delete(json);
+        return NULL;
+    }
 
-                token = strtok(NULL, ",");
-                if (token) {
-                    resultado->numero_atomico = atoi(token); 
-                } else {
-                    resultado->numero_atomico = 0;
-                }
-
-                fclose(archivo);
-                return 1;
-            }
+    AtomoData *res = calloc(1, sizeof(AtomoData));
+    res->Z = cJSON_GetObjectItemCaseSensitive(elem_json, "Z")->valueint;
+    strcpy(res->simbolo, simbolo_buscado);
+    
+    cJSON *estados = cJSON_GetObjectItemCaseSensitive(elem_json, "estados");
+    cJSON *estado = NULL;
+    
+    cJSON_ArrayForEach(estado, estados) {
+        int c = atoi(estado->string);
+        if (c >= 0 && c < 120) {
+            res->estados[c].carga = c;
+            res->estados[c].ie_ev = cJSON_GetObjectItemCaseSensitive(estado, "ie_ev")->valuedouble;
+            res->estados[c].ea_ev = cJSON_GetObjectItemCaseSensitive(estado, "ea_ev")->valuedouble;
+            res->estados[c].mulliken_ev = cJSON_GetObjectItemCaseSensitive(estado, "mulliken_ev")->valuedouble;
+            res->tiene_datos_carga[c] = 1;
+            
+            if (c == 0) res->afinidad_neutra = res->estados[c].ea_ev;
         }
     }
 
-    fclose(archivo);
-    return 0;
+    free(buffer);
+    cJSON_Delete(json);
+    return res;
 }
