@@ -1,22 +1,15 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
-#include <math.h> 
+#include <math.h>
 #include "structs.h"
 
 void procesar_referencia_pauling(AtomoData *atomo, int electrones, double m_actual) {
     int carga = atomo->Z - electrones;
     double p_ref = atomo->pauling_referencia;
-
     printf("  -> Mulliken Actual: %.4f eV\n", m_actual);
-    
-    if (carga == 0) {
-        printf("  -> Escala Pauling: = %.2f\n", p_ref);
-    } else if (carga > 0) {
-        printf("  -> Escala Pauling: > %.2f\n", p_ref);
-    } else {
-        printf("  -> Escala Pauling: < %.2f\n", p_ref);
-    }
+    if (carga == 0) printf("  -> Escala Pauling: = %.2f\n", p_ref);
+    else if (carga > 0) printf("  -> Escala Pauling: > %.2f\n", p_ref);
+    else printf("  -> Escala Pauling: < %.2f\n", p_ref);
 }
 
 int main() {
@@ -24,7 +17,7 @@ int main() {
     int eA, eB, LA, LB;
     double mA, mB;
 
-    printf("--- Simulador de Enlaces (Escala Mulliken eV) ---\n\n");
+    printf("--- Simulador de Enlaces NIST (V8) ---\n\n");
 
     printf("Simbolo A: "); scanf("%s", simbA);
     AtomoData *atA = cargar_elemento_json(simbA);
@@ -46,18 +39,18 @@ int main() {
 
     double delta_m = fabs(mA - mB);
     double prom_m = (mA + mB) / 2.0;
-    
-    double ic = calcular_porcentaje_ic( (0.374 * delta_m) );
-    int k = calcular_multiplicidad(eA, eB, &LA, &LB);
+    double ic = calcular_porcentaje_ic(0.374 * delta_m);
+    int k = calcular_multiplicidad(eA, eB, atA->Z, atB->Z, &LA, &LB);
 
     printf("\n========================================\n");
     printf("      RESULTADOS DEL ENLACE (eV)\n");
     printf("========================================\n");
-    printf(" A. Delta Mulliken      : %.4f eV\n", delta_m);
-    printf(" B. Promedio Mulliken   : %.4f eV\n", prom_m);
-    printf(" C. Caracter Ionico     : %.2f %%\n", ic);
+    printf(" Delta Mulliken      : %.4f eV\n", delta_m);
+    printf(" Promedio Mulliken   : %.4f eV\n", prom_m);
+    printf(" Caracter Ionico     : %.2f %%\n", ic);
     printf("----------------------------------------\n");
-    printf(" Brazos (L): %s=%d, %s=%d | k=%d\n", simbA, LA, simbB, LB, k);
+    printf(" Brazos: %s=%d, %s=%d | k=%d\n", atA->simbolo, LA, atB->simbolo, LB, k);
+    printf(" Multiplicidad: %s\n", nombre_multiplicidad(k));
     printf(" Tipo de Enlace: %s\n", determinar_tipo_enlace_mulliken(delta_m, prom_m));
     printf("========================================\n");
 

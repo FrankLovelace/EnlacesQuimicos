@@ -12,25 +12,27 @@ typedef struct {
     int Z;
     char simbolo[5];
     double afinidad_neutra; 
-    double pauling_referencia;
+    double pauling_referencia; 
     EstadoIonico estados[120]; 
     int tiene_datos_carga[120]; 
 } AtomoData;
 
 AtomoData* cargar_elemento_json(const char* simbolo);
 void obtener_nombre_completo(const char *simbolo, char *nombre_dest);
-int obtener_limite_capa(int Z);
-double obtener_mulliken_config(AtomoData *atomo, int num_electrones);
-double convertir_a_pauling(double mulliken_ev, int Z, int num_electrones);
-const char* clasificar_ion(int carga);
 
+int es_metal_transicion(int Z);
+int obtener_limite_capa(int Z);
+int obtener_capacidad_capa(int num_electrones);
+int calcular_valencia_v(int num_electrones, int Z);
+
+double obtener_mulliken_config(AtomoData *atomo, int num_electrones);
 double calcular_delta_chi(double chiA, double chiB);
 double calcular_promedio_chi(double chiA, double chiB);
 double calcular_porcentaje_ic(double delta_chi);
-const char* determinar_tipo_enlace(double delta_chi, double promedio_chi);
 
-int calcular_valencia_v(int num_electrones);
-int calcular_multiplicidad(int eA, int eB, int *LA, int *LB);
+const char* determinar_tipo_enlace_mulliken(double delta_m, double prom_m);
+int calcular_multiplicidad(int eA, int eB, int ZA, int ZB, int *LA, int *LB);
 const char* nombre_multiplicidad(int k);
+const char* clasificar_ion(int carga);
 
 #endif
