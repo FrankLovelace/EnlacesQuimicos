@@ -38,3 +38,12 @@ double obtener_mulliken_config(AtomoData *atomo, int num_electrones) {
         return atomo->afinidad_neutra / 2.0;
     }
 }
+double convertir_a_pauling(double mulliken_ev) {
+    return (0.374 * mulliken_ev) + 0.17;
+}
+
+const char* clasificar_ion(int carga) {
+    if (carga > 0) return "Cation";
+    if (carga < 0) return "Anion";
+    return "Neutro";
+}

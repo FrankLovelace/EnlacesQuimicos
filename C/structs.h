@@ -16,7 +16,11 @@ typedef struct {
     int tiene_datos_carga[120]; 
 } AtomoData;
 
+AtomoData* cargar_elemento_json(const char* simbolo);
+void obtener_nombre_completo(const char *simbolo, char *nombre_dest);
 int obtener_limite_capa(int Z);
 double obtener_mulliken_config(AtomoData *atomo, int num_electrones);
+double convertir_a_pauling(double mulliken_ev);
+const char* clasificar_ion(int carga);
 
 #endif

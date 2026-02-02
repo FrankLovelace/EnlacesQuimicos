@@ -6,6 +6,27 @@
 
 #define RUTA_JSON "data/base_datos_quimica_final.json"
 
+void obtener_nombre_completo(const char *simbolo, char *nombre_dest) {
+    FILE *fp = fopen("data/elementos.csv", "r");
+    if (!fp) {
+        strcpy(nombre_dest, "Desconocido");
+        return;
+    }
+
+    char linea[100];
+    while (fgets(linea, sizeof(linea), fp)) {
+        char *s = strtok(linea, ",");
+        char *n = strtok(NULL, ",");
+        if (s && n && strcmp(s, simbolo) == 0) {
+            strcpy(nombre_dest, n);
+            fclose(fp);
+            return;
+        }
+    }
+    strcpy(nombre_dest, "Desconocido");
+    fclose(fp);
+}
+
 AtomoData* cargar_elemento_json(const char* simbolo_buscado) {
     
     FILE *fp = fopen(RUTA_JSON, "r");
@@ -38,18 +59,18 @@ AtomoData* cargar_elemento_json(const char* simbolo_buscado) {
     cJSON *estados = cJSON_GetObjectItemCaseSensitive(elem_json, "estados");
     cJSON *estado = NULL;
     
-    cJSON_ArrayForEach(estado, estados) {
-        int c = atoi(estado->string);
-        if (c >= 0 && c < 120) {
-            res->estados[c].carga = c;
-            res->estados[c].ie_ev = cJSON_GetObjectItemCaseSensitive(estado, "ie_ev")->valuedouble;
-            res->estados[c].ea_ev = cJSON_GetObjectItemCaseSensitive(estado, "ea_ev")->valuedouble;
-            res->estados[c].mulliken_ev = cJSON_GetObjectItemCaseSensitive(estado, "mulliken_ev")->valuedouble;
-            res->tiene_datos_carga[c] = 1;
-            
-            if (c == 0) res->afinidad_neutra = res->estados[c].ea_ev;
-        }
+cJSON_ArrayForEach(estado, estados) {
+    int c = atoi(estado->string);
+    if (c >= 0 && c < 120) {
+        res->estados[c].carga = c;
+        res->estados[c].ie_ev = cJSON_GetObjectItemCaseSensitive(estado, "ie_ev")->valuedouble;
+        res->estados[c].ea_ev = cJSON_GetObjectItemCaseSensitive(estado, "ea_ev")->valuedouble;
+        res->estados[c].mulliken_ev = cJSON_GetObjectItemCaseSensitive(estado, "mulliken_ev")->valuedouble;
+        res->tiene_datos_carga[c] = 1;
+        
+        if (c == 0) res->afinidad_neutra = res->estados[c].ea_ev;
     }
+}
 
     free(buffer);
     cJSON_Delete(json);
