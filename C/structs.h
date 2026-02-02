@@ -23,4 +23,9 @@ double obtener_mulliken_config(AtomoData *atomo, int num_electrones);
 double convertir_a_pauling(double mulliken_ev);
 const char* clasificar_ion(int carga);
 
+double calcular_delta_chi(double chiA, double chiB);
+double calcular_promedio_chi(double chiA, double chiB);
+double calcular_porcentaje_ic(double delta_chi);
+const char* determinar_tipo_enlace(double delta_chi, double promedio_chi);
+
 #endif

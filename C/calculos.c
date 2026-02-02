@@ -1,4 +1,6 @@
 #include <stdio.h>
+#include <math.h>
+#include <stdlib.h>
 #include "structs.h"
 
 int obtener_limite_capa(int Z) {
@@ -46,4 +48,28 @@ const char* clasificar_ion(int carga) {
     if (carga > 0) return "Cation";
     if (carga < 0) return "Anion";
     return "Neutro";
+}
+
+double calcular_delta_chi(double chiA, double chiB) {
+    return fabs(chiA - chiB);
+}
+
+double calcular_promedio_chi(double chiA, double chiB) {
+    return (chiA + chiB) / 2.0;
+}
+
+double calcular_porcentaje_ic(double delta_chi) {
+    return (1.0 - exp(-0.25 * pow(delta_chi, 2))) * 100.0;
+}
+
+const char* determinar_tipo_enlace(double delta_chi, double promedio_chi) {
+    if (promedio_chi < 2.0) {
+        return "Metálico";
+    } else if (delta_chi > 1.7) {
+        return "Iónico";
+    } else if (delta_chi > 0.4 && delta_chi <= 1.7) {
+        return "Covalente Polar";
+    } else {
+        return "Covalente No Polar";
+    }
 }
