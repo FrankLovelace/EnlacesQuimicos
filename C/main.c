@@ -1,53 +1,64 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+#include <math.h> 
 #include "structs.h"
+
+void procesar_referencia_pauling(AtomoData *atomo, int electrones, double m_actual) {
+    int carga = atomo->Z - electrones;
+    double p_ref = atomo->pauling_referencia;
+
+    printf("  -> Mulliken Actual: %.4f eV\n", m_actual);
+    
+    if (carga == 0) {
+        printf("  -> Escala Pauling: = %.2f\n", p_ref);
+    } else if (carga > 0) {
+        printf("  -> Escala Pauling: > %.2f\n", p_ref);
+    } else {
+        printf("  -> Escala Pauling: < %.2f\n", p_ref);
+    }
+}
 
 int main() {
     char simbA[5], simbB[5], nomA[50], nomB[50];
     int eA, eB, LA, LB;
-    double chiA, chiB;
+    double mA, mB;
 
-    printf("--- Simulador de Enlaces NIST ---\n\n");
+    printf("--- Simulador de Enlaces (Escala Mulliken eV) ---\n\n");
 
-    printf("Simbolo Elemento A: "); scanf("%s", simbA);
+    printf("Simbolo A: "); scanf("%s", simbA);
     AtomoData *atA = cargar_elemento_json(simbA);
     if (!atA) return 1;
     obtener_nombre_completo(atA->simbolo, nomA);
-    printf(" > %s cargado (Z=%d)\n", nomA, atA->Z);
-    
-    printf(" Introduce electrones (0-%d): ", obtener_limite_capa(atA->Z));
-    scanf("%d", &eA);
-    double m_evA = obtener_mulliken_config(atA, eA);
-chiA = convertir_a_pauling(m_evA, atA->Z, eA); 
-printf("  -> Electronegatividad Pauling: %.4f\n\n", chiA);
+    printf(" > %s (Z=%d)\n", nomA, atA->Z);
+    printf(" Electrones (0-%d): ", obtener_limite_capa(atA->Z)); scanf("%d", &eA);
+    mA = obtener_mulliken_config(atA, eA);
+    procesar_referencia_pauling(atA, eA, mA);
 
-    printf("Simbolo Elemento B: "); scanf("%s", simbB);
+    printf("\nSimbolo B: "); scanf("%s", simbB);
     AtomoData *atB = cargar_elemento_json(simbB);
     if (!atB) { free(atA); return 1; }
     obtener_nombre_completo(atB->simbolo, nomB);
-    printf(" > %s cargado (Z=%d)\n", nomB, atB->Z);
+    printf(" > %s (Z=%d)\n", nomB, atB->Z);
+    printf(" Electrones (0-%d): ", obtener_limite_capa(atB->Z)); scanf("%d", &eB);
+    mB = obtener_mulliken_config(atB, eB);
+    procesar_referencia_pauling(atB, eB, mB);
 
-    printf(" Introduce electrones (0-%d): ", obtener_limite_capa(atB->Z));
-    scanf("%d", &eB);
-    double m_evB = obtener_mulliken_config(atB, eB);
-chiB = convertir_a_pauling(m_evB, atB->Z, eB); 
-printf("  -> Electronegatividad Pauling: %.4f\n", chiB);
-
-    double delta = calcular_delta_chi(chiA, chiB);
-    double prom = calcular_promedio_chi(chiA, chiB);
-    double ic = calcular_porcentaje_ic(delta);
+    double delta_m = fabs(mA - mB);
+    double prom_m = (mA + mB) / 2.0;
+    
+    double ic = calcular_porcentaje_ic( (0.374 * delta_m) );
     int k = calcular_multiplicidad(eA, eB, &LA, &LB);
 
     printf("\n========================================\n");
-    printf("      RESULTADOS DEL ENLACE\n");
+    printf("      RESULTADOS DEL ENLACE (eV)\n");
     printf("========================================\n");
-    printf(" A. Diferencia (Delta Chi) : %.4f\n", delta);
-    printf(" B. Promedio (Chi barra)   : %.4f\n", prom);
-    printf(" C. Caracter Ionico (%%IC)  : %.2f %%\n", ic);
+    printf(" A. Delta Mulliken      : %.4f eV\n", delta_m);
+    printf(" B. Promedio Mulliken   : %.4f eV\n", prom_m);
+    printf(" C. Caracter Ionico     : %.2f %%\n", ic);
     printf("----------------------------------------\n");
-    printf(" Brazos Libres (L): %s=%d, %s=%d\n", simbA, LA, simbB, LB);
-    printf(" Multiplicidad (k): %d -> %s\n", k, nombre_multiplicidad(k));
-    printf(" Tipo de Enlace   : %s\n", determinar_tipo_enlace(delta, prom));
+    printf(" Brazos (L): %s=%d, %s=%d | k=%d\n", simbA, LA, simbB, LB, k);
+    printf(" Tipo de Enlace: %s\n", determinar_tipo_enlace_mulliken(delta_m, prom_m));
     printf("========================================\n");
 
     free(atA); free(atB);

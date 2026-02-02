@@ -72,7 +72,28 @@ cJSON_ArrayForEach(estado, estados) {
     }
 }
 
-    free(buffer);
-    cJSON_Delete(json);
+     FILE *fp_p = fopen("data/paulling.json", "r");
+    if (fp_p) {
+        fseek(fp_p, 0, SEEK_END);
+        long size_p = ftell(fp_p);
+        fseek(fp_p, 0, SEEK_SET);
+        char *buffer_p = malloc(size_p + 1);
+        fread(buffer_p, 1, size_p, fp_p);
+        fclose(fp_p);
+        buffer_p[size_p] = '\0';
+
+        cJSON *json_p = cJSON_Parse(buffer_p);
+        cJSON *val_p = cJSON_GetObjectItemCaseSensitive(json_p, simbolo_buscado);
+        
+        if (val_p) {
+            res->pauling_referencia = val_p->valuedouble;
+        } else {
+            res->pauling_referencia = 0.0;
+        }
+        
+        free(buffer_p);
+        cJSON_Delete(json_p);
+    }
+
     return res;
 }

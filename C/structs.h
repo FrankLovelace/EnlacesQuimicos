@@ -12,6 +12,7 @@ typedef struct {
     int Z;
     char simbolo[5];
     double afinidad_neutra; 
+    double pauling_referencia;
     EstadoIonico estados[120]; 
     int tiene_datos_carga[120]; 
 } AtomoData;

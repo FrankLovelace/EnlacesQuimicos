@@ -50,17 +50,43 @@ double obtener_mulliken_config(AtomoData *atomo, int num_electrones) {
     }
 }
 
-double convertir_a_pauling(double mulliken_ev, int Z, int num_electrones) {
-    if (Z == 1 && num_electrones == 0) {
-        return 0.0; 
+
+
+double derivada_edo(double x, double y) {
+    double numerador = 0.4 * y;
+    double denominador = 1.0 + (0.1 * x);
+    double saturacion = 1.0 - (y / 5.0); 
+    
+    return (numerador / denominador) * saturacion;
+}
+
+double resolver_pauling_rk4(double x_target) {
+    double x = 2.42; 
+    double y = 0.82; 
+    
+    if (x_target < x) return 0.7; 
+
+    double h = 0.05; 
+    
+    while (x < x_target) {
+        if (x + h > x_target) {
+            h = x_target - x;
+        }
+
+        double k1 = h * derivada_edo(x, y);
+        double k2 = h * derivada_edo(x + 0.5*h, y + 0.5*k1);
+        double k3 = h * derivada_edo(x + 0.5*h, y + 0.5*k2);
+        double k4 = h * derivada_edo(x + h, y + k3);
+
+        y = y + (k1 + 2*k2 + 2*k3 + k4) / 6.0;
+        x = x + h;
     }
 
-    double pauling = (0.374 * mulliken_ev) + 0.17;
-
-    if (pauling < 0) return 0.0;
-
-    return pauling;
+    if (y > 4.0) return 4.0; 
+    return y;
 }
+
+
 
 const char* clasificar_ion(int carga) {
     if (carga > 0) return "Cation";
@@ -81,16 +107,22 @@ double calcular_porcentaje_ic(double delta_chi) {
     return (1.0 - exp(-0.25 * pow(delta_chi, 2))) * 100.0;
 }
 
-const char* determinar_tipo_enlace(double delta_chi, double promedio_chi) {
-    if (promedio_chi < 2.0) {
+const char* determinar_tipo_enlace_mulliken(double delta_mulliken, double promedio_mulliken) {
+    if (promedio_mulliken < 4.89) {
         return "Metálico";
-    } else if (delta_chi > 1.7) {
+    } 
+    if (delta_mulliken > 4.10) {
         return "Iónico";
-    } else if (delta_chi > 0.4 && delta_chi <= 1.7) {
+    } 
+    if (delta_mulliken > 0.61) {
         return "Covalente Polar";
-    } else {
-        return "Covalente No Polar";
-    }
+    } 
+    return "Covalente No Polar";
+}
+
+double calcular_referencia_pauling(double x) {
+    if (x < 0) return 0.0;
+    return (0.374 * x) + 0.17; 
 }
 
 
