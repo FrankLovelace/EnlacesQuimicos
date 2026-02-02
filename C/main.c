@@ -2,58 +2,56 @@
 #include <stdlib.h>
 #include "structs.h"
 
-void imprimir_atomo_stats(AtomoData *atomo, int electrones, double *chi_pauling) {
-    char nombre[50];
-    obtener_nombre_completo(atomo->simbolo, nombre);
-    double m_ev = obtener_mulliken_config(atomo, electrones);
-    *chi_pauling = convertir_a_pauling(m_ev);
-    int carga = atomo->Z - electrones;
-
-    printf("\n--- Datos de %s (%s) ---\n", nombre, atomo->simbolo);
-    printf(" Carga: %d (%s) | Pauling: %.4f\n", carga, clasificar_ion(carga), *chi_pauling);
-}
-
 int main() {
-    char simbA[5], simbB[5];
-    int eA, eB;
+    char simbA[5], simbB[5], nomA[50], nomB[50];
+    int eA, eB, LA, LB;
     double chiA, chiB;
 
-    printf("--- Simulador de Enlaces de 2 Elementos ---\n");
+    printf("--- Simulador de Enlaces NIST ---\n\n");
 
     printf("Simbolo Elemento A: "); scanf("%s", simbA);
     AtomoData *atA = cargar_elemento_json(simbA);
     if (!atA) return 1;
-    printf("Electrones para %s (0-%d): ", simbA, obtener_limite_capa(atA->Z));
+    obtener_nombre_completo(atA->simbolo, nomA);
+    printf(" > %s cargado (Z=%d)\n", nomA, atA->Z);
+    
+    printf(" Introduce electrones (0-%d): ", obtener_limite_capa(atA->Z));
     scanf("%d", &eA);
+    double m_evA = obtener_mulliken_config(atA, eA);
+chiA = convertir_a_pauling(m_evA, atA->Z, eA); 
+printf("  -> Electronegatividad Pauling: %.4f\n\n", chiA);
 
     printf("Simbolo Elemento B: "); scanf("%s", simbB);
     AtomoData *atB = cargar_elemento_json(simbB);
     if (!atB) { free(atA); return 1; }
-    printf("Electrones para %s (0-%d): ", simbB, obtener_limite_capa(atB->Z));
+    obtener_nombre_completo(atB->simbolo, nomB);
+    printf(" > %s cargado (Z=%d)\n", nomB, atB->Z);
+
+    printf(" Introduce electrones (0-%d): ", obtener_limite_capa(atB->Z));
     scanf("%d", &eB);
+    double m_evB = obtener_mulliken_config(atB, eB);
+chiB = convertir_a_pauling(m_evB, atB->Z, eB); 
+printf("  -> Electronegatividad Pauling: %.4f\n", chiB);
 
-    imprimir_atomo_stats(atA, eA, &chiA);
-    imprimir_atomo_stats(atB, eB, &chiB);
-
-    double delta_chi = calcular_delta_chi(chiA, chiB);
-    double promedio_chi = calcular_promedio_chi(chiA, chiB);
-    double porcentaje_ic = calcular_porcentaje_ic(delta_chi);
-    const char* tipo = determinar_tipo_enlace(delta_chi, promedio_chi);
+    double delta = calcular_delta_chi(chiA, chiB);
+    double prom = calcular_promedio_chi(chiA, chiB);
+    double ic = calcular_porcentaje_ic(delta);
+    int k = calcular_multiplicidad(eA, eB, &LA, &LB);
 
     printf("\n========================================\n");
-    printf("  ANALISIS DEL ENLACE\n");
+    printf("      RESULTADOS DEL ENLACE\n");
     printf("========================================\n");
-    printf(" A. Diferencia (Delta Chi) : %.4f\n", delta_chi);
-    printf(" B. Promedio (Chi barra)   : %.4f\n", promedio_chi);
-    printf(" C. Caracter Ionico (%%IC)  : %.2f %%\n", porcentaje_ic);
+    printf(" A. Diferencia (Delta Chi) : %.4f\n", delta);
+    printf(" B. Promedio (Chi barra)   : %.4f\n", prom);
+    printf(" C. Caracter Ionico (%%IC)  : %.2f %%\n", ic);
     printf("----------------------------------------\n");
-    printf(" TIPO DE ENLACE ESTIMADO: %s\n", tipo);
+    printf(" Brazos Libres (L): %s=%d, %s=%d\n", simbA, LA, simbB, LB);
+    printf(" Multiplicidad (k): %d -> %s\n", k, nombre_multiplicidad(k));
+    printf(" Tipo de Enlace   : %s\n", determinar_tipo_enlace(delta, prom));
     printf("========================================\n");
 
-    free(atA);
-    free(atB);
+    free(atA); free(atB);
     printf("\nPresiona Enter para cerrar...");
     fflush(stdin); getchar(); getchar();
-
     return 0;
 }

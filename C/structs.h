@@ -20,12 +20,16 @@ AtomoData* cargar_elemento_json(const char* simbolo);
 void obtener_nombre_completo(const char *simbolo, char *nombre_dest);
 int obtener_limite_capa(int Z);
 double obtener_mulliken_config(AtomoData *atomo, int num_electrones);
-double convertir_a_pauling(double mulliken_ev);
+double convertir_a_pauling(double mulliken_ev, int Z, int num_electrones);
 const char* clasificar_ion(int carga);
 
 double calcular_delta_chi(double chiA, double chiB);
 double calcular_promedio_chi(double chiA, double chiB);
 double calcular_porcentaje_ic(double delta_chi);
 const char* determinar_tipo_enlace(double delta_chi, double promedio_chi);
+
+int calcular_valencia_v(int num_electrones);
+int calcular_multiplicidad(int eA, int eB, int *LA, int *LB);
+const char* nombre_multiplicidad(int k);
 
 #endif
