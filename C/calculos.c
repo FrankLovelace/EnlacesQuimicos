@@ -49,8 +49,10 @@ double calcular_promedio_chi(double chiA, double chiB) { return (chiA + chiB) / 
 double calcular_porcentaje_ic(double delta_chi) { return (1.0 - exp(-0.25 * pow(delta_chi, 2))) * 100.0; }
 
 const char* determinar_tipo_enlace_mulliken(double delta_m, double prom_m) {
-    if (prom_m < 4.89) return "Metálico";
+    if (prom_m < 4.89 && delta_m < 4.10) return "Metálico";
+    
     if (delta_m > 4.10) return "Iónico";
+    
     if (delta_m > 0.61) return "Covalente Polar";
     return "Covalente No Polar";
 }
