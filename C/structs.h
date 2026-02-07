@@ -31,7 +31,7 @@ double calcular_delta_chi(double chiA, double chiB);
 double calcular_promedio_chi(double chiA, double chiB);
 double calcular_porcentaje_ic(double delta_mulliken);
 
-const char* determinar_tipo_enlace_mulliken(double delta_m, double prom_m, double mA, double mB, int ZA, int ZB);
+const char* determinar_tipo_enlace_mulliken(double delta_m, double prom_m, double mA, double mB, int ZA, int ZB, int k);
 int calcular_multiplicidad(int eA, int eB, int ZA, int ZB, int *LA, int *LB);
 const char* nombre_multiplicidad(int k);
 const char* clasificar_ion(int carga);
