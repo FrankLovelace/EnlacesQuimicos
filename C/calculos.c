@@ -17,6 +17,10 @@ int obtener_limite_capa(int Z) {
     return 118;
 }
 
+int obtener_limite_capa_estricto(int Z) {
+    return Z; 
+}
+
 int obtener_capacidad_capa(int num_electrones) {
     if (num_electrones <= 2) return 2;
     return 8;
@@ -33,15 +37,16 @@ int calcular_valencia_v(int num_electrones, int Z) {
 
 double obtener_mulliken_config(AtomoData *atomo, int num_electrones) {
     int carga = atomo->Z - num_electrones;
-    if (carga >= 0) {
-        if (carga < 120 && atomo->tiene_datos_carga[carga]) return atomo->estados[carga].mulliken_ev;
-        return 0.0; 
-    } else {
-        int max_e = obtener_limite_capa(atomo->Z);
-        if (carga < (atomo->Z - max_e)) return -1.0;
-        if (carga == (atomo->Z - max_e)) return 0.0;
-        return atomo->afinidad_neutra / 2.0;
+
+    if (carga < 0) {
+        return -2.0; 
     }
+
+    if (carga < 120 && atomo->tiene_datos_carga[carga]) {
+        return atomo->estados[carga].mulliken_ev;
+    }
+
+    return -1.0; 
 }
 
 double calcular_delta_chi(double chiA, double chiB) { return fabs(chiA - chiB); }
