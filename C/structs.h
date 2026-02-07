@@ -21,7 +21,8 @@ AtomoData* cargar_elemento_json(const char* simbolo);
 void obtener_nombre_completo(const char *simbolo, char *nombre_dest);
 
 int es_metal_transicion(int Z);
-int obtener_limite_capa(int Z);
+int es_lantanido_actinido(int Z);
+int es_gas_noble_z(int Z);
 int obtener_capacidad_capa(int num_electrones);
 int calcular_valencia_v(int num_electrones, int Z);
 
@@ -30,7 +31,7 @@ double calcular_delta_chi(double chiA, double chiB);
 double calcular_promedio_chi(double chiA, double chiB);
 double calcular_porcentaje_ic(double delta_chi);
 
-const char* determinar_tipo_enlace_mulliken(double delta_m, double prom_m);
+const char* determinar_tipo_enlace_mulliken(double delta_m, double prom_m, int ZA, int ZB);
 int calcular_multiplicidad(int eA, int eB, int ZA, int ZB, int *LA, int *LB);
 const char* nombre_multiplicidad(int k);
 const char* clasificar_ion(int carga);

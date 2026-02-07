@@ -81,7 +81,7 @@ int main() {
     printf("----------------------------------------\n");
     printf(" Brazos Libres (L)   : %s=%d, %s=%d\n", atA->simbolo, LA, atB->simbolo, LB);
     printf(" Multiplicidad (k)   : %d -> %s\n", k, nombre_multiplicidad(k));
-    printf(" Clasificacion       : %s\n", determinar_tipo_enlace_mulliken(delta_m, prom_m));
+    printf(" Clasificacion       : %s\n", determinar_tipo_enlace_mulliken(delta_m, prom_m, atA->Z, atB->Z));
     printf("========================================\n");
 
     free(atA);
