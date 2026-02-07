@@ -98,7 +98,7 @@ int calcular_multiplicidad(int eA, int eB, int ZA, int ZB, int *LA, int *LB) {
         *LA = (huecos < vA) ? huecos : vA;
     }
 
-    if (es_metal_transicion(ZB) || es_lantanido_actinido(ZB)) {
+     if (es_metal_transicion(ZB) || es_lantanido_actinido(ZB)) {
         *LB = vB;
     } else {
         int cap = (eB <= 2) ? 2 : 8;
@@ -109,7 +109,14 @@ int calcular_multiplicidad(int eA, int eB, int ZA, int ZB, int *LA, int *LB) {
     if (*LA < 0) *LA = 0;
     if (*LB < 0) *LB = 0;
 
-    int k = (*LA < *LB) ? *LA : *LB;
+        int k = (*LA < *LB) ? *LA : *LB;
+
+    if (es_metal_transicion(ZA) || es_metal_transicion(ZB)) {
+        if (k >= 1) {
+            k = 1; 
+        }
+    }
+
     return (k > 3) ? 3 : k;
 }
 
