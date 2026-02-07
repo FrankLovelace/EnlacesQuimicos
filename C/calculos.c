@@ -74,14 +74,31 @@ double calcular_delta_chi(double chiA, double chiB) { return fabs(chiA - chiB); 
 double calcular_promedio_chi(double chiA, double chiB) { return (chiA + chiB) / 2.0; }
 
 double calcular_porcentaje_ic(double delta_mulliken) {
-    double delta_p = 0.374 * delta_mulliken;
+    double dp = 0.374 * delta_mulliken;
 
-    double ic = (16.0 * delta_p) + (3.5 * pow(delta_p, 2));
+    double ic_pauling = (1.0 - exp(-0.25 * pow(dp, 2))) * 100.0;
     
-    if (ic > 100.0) return 100.0;
-    if (ic < 0.0) return 0.0;
-    
-    return ic;
+    double ic_hannay = (16.0 * dp) + (3.5 * pow(dp, 2));
+    if (ic_hannay > 100.0) ic_hannay = 100.0;
+
+    double ic_final = 0.0;
+
+    if (dp < 1.6) {
+        ic_final = ic_pauling;
+    } 
+    else if (dp > 2.4) {
+        ic_final = ic_hannay;
+    } 
+    else {
+        double w = (dp - 1.6) / (2.4 - 1.6);
+        
+        ic_final = ((1.0 - w) * ic_pauling) + (w * ic_hannay);
+    }
+
+    if (ic_final > 100.0) return 100.0;
+    if (ic_final < 0.0) return 0.0;
+
+    return ic_final;
 }
 
 const char* determinar_tipo_enlace_mulliken(double delta_m, double prom_m, int ZA, int ZB) {
