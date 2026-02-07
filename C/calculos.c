@@ -101,15 +101,30 @@ double calcular_porcentaje_ic(double delta_mulliken) {
     return ic_final;
 }
 
-const char* determinar_tipo_enlace_mulliken(double delta_m, double prom_m, int ZA, int ZB) {
-     if (es_gas_noble_z(ZA) || es_gas_noble_z(ZB)) {
+const char* determinar_tipo_enlace_mulliken(double delta_m, double prom_m, double mA, double mB, int ZA, int ZB) {
+     if (mA < 1.0 || mB < 1.0) {
+        if (es_gas_noble_z(ZA) || es_gas_noble_z(ZB)) {
+            return "Fuerzas de Van der Waals (Inerte)";
+        }
+        return "Inestable (Repulsión Electrostática)";
+    }
+
+    if (es_gas_noble_z(ZA) || es_gas_noble_z(ZB)) {
         if (delta_m > 0.1) return "Covalente Polar (Gas Noble)";
         else return "Fuerzas de Van der Waals";
     }
 
-    if (prom_m < 4.89) return "Metálico";
-    if (delta_m > 4.10) return "Iónico";
-    if (delta_m > 0.61) return "Covalente Polar";
+    if (prom_m < 4.89) {
+        return "Metálico";
+    }
+
+    if (delta_m > 4.10) {
+        return "Iónico";
+    } 
+    if (delta_m > 0.61) {
+        return "Covalente Polar";
+    } 
+    
     return "Covalente No Polar";
 }
 
