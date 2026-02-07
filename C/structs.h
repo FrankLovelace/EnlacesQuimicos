@@ -36,4 +36,6 @@ int calcular_multiplicidad(int eA, int eB, int ZA, int ZB, int *LA, int *LB);
 const char* nombre_multiplicidad(int k);
 const char* clasificar_ion(int carga);
 
+
+
 #endif

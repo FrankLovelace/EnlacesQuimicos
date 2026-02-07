@@ -5,33 +5,14 @@
 #include "cJSON.h" 
 
 #define RUTA_JSON "data/base_datos_quimica_final.json"
-
-void obtener_nombre_completo(const char *simbolo, char *nombre_dest) {
-    FILE *fp = fopen("data/elementos.csv", "r");
-    if (!fp) {
-        strcpy(nombre_dest, "Desconocido");
-        return;
-    }
-
-    char linea[100];
-    while (fgets(linea, sizeof(linea), fp)) {
-        char *s = strtok(linea, ",");
-        char *n = strtok(NULL, ",");
-        if (s && n && strcmp(s, simbolo) == 0) {
-            strcpy(nombre_dest, n);
-            fclose(fp);
-            return;
-        }
-    }
-    strcpy(nombre_dest, "Desconocido");
-    fclose(fp);
-}
+#define RUTA_PAULING "data/paulling.json"
+#define RUTA_CSV "data/elementos.csv"
 
 AtomoData* cargar_elemento_json(const char* simbolo_buscado) {
-    
+     
     FILE *fp = fopen(RUTA_JSON, "r");
     if (!fp) {
-        printf("Error: No se encontro el JSON en %s\n", RUTA_JSON);
+        printf("[C ERROR] No se pudo abrir %s\n", RUTA_JSON);
         return NULL;
     }
 
@@ -44,35 +25,54 @@ AtomoData* cargar_elemento_json(const char* simbolo_buscado) {
     buffer[size] = '\0';
 
     cJSON *json = cJSON_Parse(buffer);
-    cJSON *elem_json = cJSON_GetObjectItemCaseSensitive(json, simbolo_buscado);
+    if (!json) {
+        printf("[C ERROR] Fallo al parsear el JSON global.\n");
+        free(buffer);
+        return NULL;
+    }
 
+    cJSON *elem_json = cJSON_GetObjectItemCaseSensitive(json, simbolo_buscado);
     if (!elem_json) {
+        printf("[C DEBUG] El elemento '%s' no esta en el JSON.\n", simbolo_buscado);
         free(buffer);
         cJSON_Delete(json);
         return NULL;
     }
 
     AtomoData *res = calloc(1, sizeof(AtomoData));
-    res->Z = cJSON_GetObjectItemCaseSensitive(elem_json, "Z")->valueint;
+    
+    cJSON *z_item = cJSON_GetObjectItemCaseSensitive(elem_json, "Z");
+    if (z_item) res->Z = z_item->valueint;
+    
     strcpy(res->simbolo, simbolo_buscado);
     
     cJSON *estados = cJSON_GetObjectItemCaseSensitive(elem_json, "estados");
-    cJSON *estado = NULL;
-    
-cJSON_ArrayForEach(estado, estados) {
-    int c = atoi(estado->string);
-    if (c >= 0 && c < 120) {
-        res->estados[c].carga = c;
-        res->estados[c].ie_ev = cJSON_GetObjectItemCaseSensitive(estado, "ie_ev")->valuedouble;
-        res->estados[c].ea_ev = cJSON_GetObjectItemCaseSensitive(estado, "ea_ev")->valuedouble;
-        res->estados[c].mulliken_ev = cJSON_GetObjectItemCaseSensitive(estado, "mulliken_ev")->valuedouble;
-        res->tiene_datos_carga[c] = 1;
+    if (estados) {
+        cJSON *estado = NULL;
+        int contador = 0;
         
-        if (c == 0) res->afinidad_neutra = res->estados[c].ea_ev;
+        cJSON_ArrayForEach(estado, estados) {
+            int c = atoi(estado->string); 
+            
+            if (c >= 0 && c < 120) {
+                res->estados[c].carga = c;
+                res->estados[c].mulliken_ev = cJSON_GetObjectItemCaseSensitive(estado, "mulliken_ev")->valuedouble;
+                
+                res->tiene_datos_carga[c] = 1;
+                
+                if (c == 0) {
+                    res->afinidad_neutra = cJSON_GetObjectItemCaseSensitive(estado, "ea_ev")->valuedouble;
+                }
+                contador++;
+            }
+        }
+        printf("[C DEBUG] %s -> Se cargaron %d estados ionicos.\n", simbolo_buscado, contador);
     }
-}
 
-     FILE *fp_p = fopen("data/paulling.json", "r");
+    free(buffer);
+    cJSON_Delete(json);
+
+    FILE *fp_p = fopen(RUTA_PAULING, "r");
     if (fp_p) {
         fseek(fp_p, 0, SEEK_END);
         long size_p = ftell(fp_p);
@@ -85,15 +85,43 @@ cJSON_ArrayForEach(estado, estados) {
         cJSON *json_p = cJSON_Parse(buffer_p);
         cJSON *val_p = cJSON_GetObjectItemCaseSensitive(json_p, simbolo_buscado);
         
-        if (val_p) {
-            res->pauling_referencia = val_p->valuedouble;
-        } else {
-            res->pauling_referencia = 0.0;
-        }
+        if (val_p) res->pauling_referencia = val_p->valuedouble;
+        else res->pauling_referencia = 0.0;
         
         free(buffer_p);
         cJSON_Delete(json_p);
     }
 
     return res;
+}
+
+void obtener_nombre_completo(const char *simbolo, char *nombre_dest) {
+    FILE *fp = fopen(RUTA_CSV, "r");
+    if (!fp) {
+        printf("[C ERROR] No se encontro %s\n", RUTA_CSV);
+        strcpy(nombre_dest, simbolo); 
+        return;
+    }
+
+    char linea[128];
+    while (fgets(linea, sizeof(linea), fp)) {
+        char linea_tmp[128];
+        strcpy(linea_tmp, linea);
+
+        char *token_simbolo = strtok(linea_tmp, ",");
+        char *token_nombre = strtok(NULL, ",");
+
+        if (token_simbolo && token_nombre) {
+            token_nombre[strcspn(token_nombre, "\r\n")] = 0;
+
+            if (strcmp(token_simbolo, simbolo) == 0) {
+                strcpy(nombre_dest, token_nombre);
+                fclose(fp);
+                return;
+            }
+        }
+    }
+
+    strcpy(nombre_dest, "Desconocido");
+    fclose(fp);
 }
