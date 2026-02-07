@@ -29,7 +29,7 @@ int calcular_valencia_v(int num_electrones, int Z);
 double obtener_mulliken_config(AtomoData *atomo, int num_electrones);
 double calcular_delta_chi(double chiA, double chiB);
 double calcular_promedio_chi(double chiA, double chiB);
-double calcular_porcentaje_ic(double delta_chi);
+double calcular_porcentaje_ic(double delta_mulliken);
 
 const char* determinar_tipo_enlace_mulliken(double delta_m, double prom_m, int ZA, int ZB);
 int calcular_multiplicidad(int eA, int eB, int ZA, int ZB, int *LA, int *LB);

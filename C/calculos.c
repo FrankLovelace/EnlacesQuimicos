@@ -72,7 +72,17 @@ double obtener_mulliken_config(AtomoData *atomo, int num_electrones) {
 
 double calcular_delta_chi(double chiA, double chiB) { return fabs(chiA - chiB); }
 double calcular_promedio_chi(double chiA, double chiB) { return (chiA + chiB) / 2.0; }
-double calcular_porcentaje_ic(double delta_chi) { return (1.0 - exp(-0.25 * pow(delta_chi, 2))) * 100.0; }
+
+double calcular_porcentaje_ic(double delta_mulliken) {
+    double delta_p = 0.374 * delta_mulliken;
+
+    double ic = (16.0 * delta_p) + (3.5 * pow(delta_p, 2));
+    
+    if (ic > 100.0) return 100.0;
+    if (ic < 0.0) return 0.0;
+    
+    return ic;
+}
 
 const char* determinar_tipo_enlace_mulliken(double delta_m, double prom_m, int ZA, int ZB) {
      if (es_gas_noble_z(ZA) || es_gas_noble_z(ZB)) {

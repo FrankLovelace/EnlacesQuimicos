@@ -67,7 +67,7 @@ int main() {
 
     double delta_m = fabs(mA - mB);
     double prom_m = (mA + mB) / 2.0;
-    double ic = calcular_porcentaje_ic(0.374 * delta_m);
+    double ic = calcular_porcentaje_ic(delta_m); 
     int k = calcular_multiplicidad(eA, eB, atA->Z, atB->Z, &LA, &LB);
 
 
