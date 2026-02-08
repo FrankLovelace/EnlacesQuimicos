@@ -2,179 +2,231 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title> NIST</title>
+    <title>Dashboard Químico VAK</title>
     <style>
         :root { --primary: #007acc; --bg: #121212; --card: #1e1e1e; --text: #e0e0e0; }
-        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); padding: 40px; display: flex; justify-content: center; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); padding: 20px; display: flex; flex-direction: column; align-items: center; }
         
-        .dashboard { display: grid; grid-template-columns: 1fr 350px; gap: 30px; max-width: 1100px; width: 100%; }
+        .dashboard { display: grid; grid-template-columns: 1fr 400px; gap: 20px; max-width: 1200px; width: 100%; }
         
-        .main-panel { background: var(--card); padding: 30px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-        .stats-panel { background: #252526; padding: 25px; border-radius: 15px; border: 1px solid #333; height: fit-content; }
+        .main-panel { background: var(--card); padding: 25px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .stats-panel { background: #252526; padding: 20px; border-radius: 15px; border: 1px solid #333; height: fit-content; }
 
-        .atom-row { display: flex; gap: 20px; margin-bottom: 25px; align-items: flex-end; }
+        .atom-row { display: flex; gap: 15px; margin-bottom: 20px; align-items: flex-end; }
         .input-group { display: flex; flex-direction: column; }
+        label { font-size: 0.8rem; color: #888; margin-bottom: 5px; text-transform: uppercase; }
         
-        label { font-size: 0.8rem; color: #888; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 1px; }
-        
-        input { background: #2d2d2d; border: 2px solid #3d3d3d; color: white; padding: 12px; border-radius: 8px; font-size: 1.2rem; outline: none; transition: 0.3s; }
+        input { background: #2d2d2d; border: 2px solid #3d3d3d; color: white; padding: 10px; border-radius: 8px; font-size: 1.1rem; outline: none; transition: 0.3s; }
         input:focus { border-color: var(--primary); }
-        
-        .inp-simb { width: 80px; text-align: center; font-weight: bold; text-transform: capitalize; }
+        .inp-simb { width: 60px; text-align: center; font-weight: bold; }
+        .inp-elec { width: 80px; }
 
-        .inp-elec { width: 100px; }
-
-        button { width: 100%; padding: 15px; background: var(--primary); border: none; color: white; font-size: 1.1rem; font-weight: bold; border-radius: 8px; cursor: pointer; margin-top: 10px; }
+        button { width: 100%; padding: 15px; background: var(--primary); border: none; color: white; font-size: 1.1rem; font-weight: bold; border-radius: 8px; cursor: pointer; }
         button:hover { background: #006bb3; }
 
-        .output-card { margin-top: 30px; padding: 20px; background: #000; border-radius: 10px; border-left: 5px solid var(--primary); display: none; }
-        .output-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-family: monospace; color: #4caf50; margin-top: 10px; }
+        .output-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-family: monospace; color: #4caf50; margin-top: 15px; font-size: 0.9rem; }
         
-        .mini-stat { margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid #333; }
-        .stat-val { font-size: 1.4rem; color: var(--primary); font-weight: bold; }
-        .stat-sub { font-size: 0.9rem; color: #aaa; }
+        .canvas-container { grid-column: 1 / -1; background: #000; border-radius: 15px; padding: 20px; position: relative; border: 1px solid #333; display: flex; justify-content: center;}
+        canvas { background: #0a0a0a; border-radius: 8px; cursor: crosshair; }
+        .legend { position: absolute; top: 30px; right: 30px; font-size: 0.8rem; color: #aaa; text-align: right; pointer-events: none; }
     </style>
 </head>
 <body>
 
 <div class="dashboard">
-    
     <div class="main-panel">
-        <h1 style="margin-top:0; color:var(--primary)">Simulador de Enlaces</h1>
-        
+        <h2 style="margin-top:0; color:var(--primary)">Datos de Entrada</h2>
         <div class="atom-row">
             <div class="input-group">
                 <label>Símbolo A</label>
-                <input type="text" id="simbA" class="inp-simb" placeholder="Ej: Au" oninput="actualizarInfo('A')">
+                <input type="text" id="simbA" class="inp-simb" placeholder="Fe" oninput="actualizarInfo('A')">
             </div>
             <div class="input-group">
                 <label>Electrones</label>
-                <input type="number" id="eA" class="inp-elec" value="" oninput="actualizarInfo('A')">
+                <input type="number" id="eA" class="inp-elec" value="26" oninput="actualizarInfo('A')">
             </div>
         </div>
-
         <div class="atom-row">
             <div class="input-group">
                 <label>Símbolo B</label>
-                <input type="text" id="simbB" class="inp-simb" placeholder="Ej: H" oninput="actualizarInfo('B')">
+                <input type="text" id="simbB" class="inp-simb" placeholder="O" oninput="actualizarInfo('B')">
             </div>
             <div class="input-group">
                 <label>Electrones</label>
-                <input type="number" id="eB" class="inp-elec" value="" oninput="actualizarInfo('B')">
+                <input type="number" id="eB" class="inp-elec" value="8" oninput="actualizarInfo('B')">
             </div>
         </div>
-
-        <button onclick="calcular()">CALCULAR ENLACE</button>
-
-        <div class="output-card" id="resCard">
-            <h3 id="resTipo" style="margin:0; color:white">Resultados</h3>
-            <div class="output-grid" id="resDetalle"></div>
-        </div>
+        <button onclick="calcular()">CALCULAR Y PLOTEAR</button>
+        <div class="output-grid" id="resDetalle"></div>
     </div>
 
     <div class="stats-panel">
-        <h3 style="margin-top:0">Información Base</h3>
-        
-        <div id="infoA" class="mini-stat">
-            <span style="color:#666">Esperando Átomo A...</span>
-        </div>
-        
-        <div id="infoB" class="mini-stat">
-            <span style="color:#666">Esperando Átomo B...</span>
-        </div>
+        <h3 style="margin-top:0">Info Átomos</h3>
+        <div id="infoA" style="margin-bottom:15px; border-bottom:1px solid #444; padding-bottom:10px;">Esperando A...</div>
+        <div id="infoB">Esperando B...</div>
     </div>
 
+    <div class="canvas-container">
+        <canvas id="vakCanvas" width="800" height="500"></canvas>
+        <div class="legend">
+            <span style="color:#ffcc00">■</span> Iónico<br>
+            <span style="color:#00ccff">■</span> Covalente Polar<br>
+            <span style="color:#ff4444">■</span> Metálico<br>
+            <span style="color:#44ff44">■</span> Cov. No Polar
+        </div>
+    </div>
 </div>
 
 <script src="quimica.js"></script>
 <script>
     let apiInfo, apiCalcular;
 
+    let puntosHistoria = []; 
+    const VAK_CONFIG = {
+        minX: 1.0, maxX: 9.0,  
+        minY: 0.0, maxY: 9.0, 
+        padding: 50
+    };
+
     createModule().then(Module => {
-        // Mapeo de funciones C -> JS
         apiInfo = Module.cwrap('obtener_info_elemento_wasm', 'string', ['string', 'number']);
         apiCalcular = Module.cwrap('calcular_enlace_wasm', 'string', ['string', 'number', 'string', 'number']);
-        
-        console.log("✅ Motor WASM listo.");
+        console.log("✅ Motor listo.");
         
         actualizarInfo('A');
         actualizarInfo('B');
+        dibujarTrianguloBase();
     });
 
     function actualizarInfo(id) {
-        if (!apiInfo) return; 
+        if(!apiInfo) return;
+        const s = document.getElementById('simb'+id).value.trim();
+        const e = parseInt(document.getElementById('e'+id).value || 0);
+        const div = document.getElementById('info'+id);
+        const inp = document.getElementById('e'+id);
 
-        const simbInput = document.getElementById('simb' + id);
-        const eInput = document.getElementById('e' + id);
-        const infoDiv = document.getElementById('info' + id);
-
-        const simb = simbInput.value.trim();
-        
-        let electrones = 0;
-        if (eInput.value !== "") {
-            electrones = parseInt(eInput.value);
-        }
-
-        if (simb.length > 0) {
-            // Llamada a C
-            const res = JSON.parse(apiInfo(simb, electrones));
-            
-            if (!res.error) {
-                let signo = "=";
-                if (res.carga > 0) signo = ">";
-                if (res.carga < 0) signo = "<";
-
-                let mullikenStr = res.mulliken < 0 ? "Sin datos NIST" : res.mulliken.toFixed(4) + " eV";
+        if(s.length > 0) {
+            const res = JSON.parse(apiInfo(s, e));
+            if(!res.error) {
+                let signo = res.carga > 0 ? ">" : (res.carga < 0 ? "<" : "=");
+                let mulliken = res.mulliken < 0 ? "Sin Datos" : res.mulliken.toFixed(2) + " eV";
                 
-                infoDiv.innerHTML = `
-                    <div style="font-size:1.2rem; color: #007acc; font-weight:bold;">${res.nombre}</div>
-                    <div class="stat-sub">Z=${res.z} | Carga: ${res.carga}</div>
-                    <div style="margin-top:5px;">Mulliken: <b style="color:white">${mullikenStr}</b></div>
-                    <div>Pauling Ref: <span style="color:#aaa">${signo} ${res.pauling_ref.toFixed(2)}</span></div>
-                `;
-
-                if (document.activeElement !== eInput) {
-                    eInput.placeholder = `0-${res.z}`;
-                }
-                eInput.max = res.z; 
-                eInput.min = 0;
-
+                div.innerHTML = `<b>${res.nombre}</b> (${res.carga>0?'+':''}${res.carga})<br>Mul: ${mulliken}<br>Pauling ${signo} ${res.pauling_ref.toFixed(2)}`;
+                if(document.activeElement !== inp) inp.placeholder = `0-${res.z}`;
+                inp.max = res.z;
             } else {
-                infoDiv.innerHTML = `<span style="color:#ff5555">Elemento no encontrado</span>`;
+                div.innerHTML = `<span style="color:red">Error</span>`;
             }
-        } else {
-            infoDiv.innerHTML = `<span style="color:#666">Esperando entrada...</span>`;
         }
     }
 
     function calcular() {
-        if (!apiCalcular) return;
-
+        if(!apiCalcular) return;
+        
         const sA = document.getElementById('simbA').value;
-        const eA = parseInt(document.getElementById('eA').value || 0);
+        const eA = parseInt(document.getElementById('eA').value||0);
         const sB = document.getElementById('simbB').value;
-        const eB = parseInt(document.getElementById('eB').value || 0);
+        const eB = parseInt(document.getElementById('eB').value||0);
 
         const data = JSON.parse(apiCalcular(sA, eA, sB, eB));
 
-        if (data.error) {
-            alert(data.error);
-            return;
-        }
+        if(data.error) { alert(data.error); return; }
 
-        const card = document.getElementById('resCard');
-        card.style.display = 'block';
-        
-        document.getElementById('resTipo').innerHTML = `
-            ${data.tipo} <span style="font-size:0.8rem; color:#aaa">(${data.k_nom})</span>
-        `;
-        
         document.getElementById('resDetalle').innerHTML = `
-            <span>Diferencia:</span> <span>${data.vak_y.toFixed(4)} eV</span>
-            <span>Promedio:</span>   <span>${data.vak_x.toFixed(4)} eV</span>
-            <span>% Iónico:</span>   <span>${data.ic.toFixed(2)}%</span>
-            <span>Brazos:</span>     <span>${data.nomA}=${data.brazosA}, ${data.nomB}=${data.brazosB}</span>
+            <span><b>${data.tipo}</b></span> <span>k=${data.k} (${data.k_nom})</span>
+            <span>Δ Mul: ${data.vak_y.toFixed(2)} eV</span>
+            <span>Prom: ${data.vak_x.toFixed(2)} eV</span>
+            <span>%IC: ${data.ic.toFixed(1)}%</span>
+            <span>Brazos: ${data.brazosA} - ${data.brazosB}</span>
         `;
+
+        puntosHistoria.push({
+            x: data.vak_x,
+            y: data.vak_y,
+            label: `${sA}-${sB}`,
+            tipo: data.tipo
+        });
+
+        dibujarTrianguloBase();
+    }
+
+    function mapX(val) {
+        const cvs = document.getElementById('vakCanvas');
+        const w = cvs.width - (VAK_CONFIG.padding * 2);
+        return VAK_CONFIG.padding + ((val - VAK_CONFIG.minX) / (VAK_CONFIG.maxX - VAK_CONFIG.minX)) * w;
+    }
+
+    function mapY(val) {
+        const cvs = document.getElementById('vakCanvas');
+        const h = cvs.height - (VAK_CONFIG.padding * 2);
+        return (cvs.height - VAK_CONFIG.padding) - ((val - VAK_CONFIG.minY) / (VAK_CONFIG.maxY - VAK_CONFIG.minY)) * h;
+    }
+
+    function dibujarTrianguloBase() {
+        const cvs = document.getElementById('vakCanvas');
+        const ctx = cvs.getContext('2d');
+        
+        ctx.clearRect(0, 0, cvs.width, cvs.height);
+
+        
+        const y5 = mapY(5.0);
+        const y15 = mapY(1.5);
+        const x6 = mapX(6.0);
+        const xMin = mapX(VAK_CONFIG.minX);
+        const xMax = mapX(VAK_CONFIG.maxX);
+        
+        ctx.fillStyle = "rgba(255, 255, 0, 0.1)";
+        ctx.fillRect(xMin, mapY(VAK_CONFIG.maxY), xMax - xMin, y5 - mapY(VAK_CONFIG.maxY));
+        
+        ctx.fillStyle = "rgba(0, 200, 255, 0.1)";
+        ctx.fillRect(xMin, y5, xMax - xMin, y15 - y5);
+
+        ctx.fillStyle = "rgba(255, 50, 50, 0.15)";
+        ctx.fillRect(xMin, y15, x6 - xMin, mapY(VAK_CONFIG.minY) - y15);
+
+        ctx.fillStyle = "rgba(50, 255, 50, 0.1)";
+        ctx.fillRect(x6, y15, xMax - x6, mapY(VAK_CONFIG.minY) - y15);
+
+        ctx.strokeStyle = "#444";
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(xMin, y5); ctx.lineTo(xMax, y5);
+        ctx.moveTo(xMin, y15); ctx.lineTo(xMax, y15);
+        ctx.moveTo(x6, y15); ctx.lineTo(x6, mapY(0));
+        ctx.stroke();
+
+        ctx.strokeStyle = "#fff";
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(mapX(VAK_CONFIG.minX), mapY(0)); ctx.lineTo(mapX(VAK_CONFIG.maxX), mapY(0)); // X
+        ctx.moveTo(mapX(VAK_CONFIG.minX), mapY(0)); ctx.lineTo(mapX(VAK_CONFIG.minX), mapY(VAK_CONFIG.maxY)); // Y
+        ctx.stroke();
+
+        ctx.fillStyle = "#fff";
+        ctx.font = "14px Arial";
+        ctx.fillText("Promedio Electronegatividad (eV)", cvs.width/2 - 100, cvs.height - 10);
+        ctx.save();
+        ctx.translate(15, cvs.height/2 + 100);
+        ctx.rotate(-Math.PI/2);
+        ctx.fillText("Diferencia Electronegatividad (eV)", 0, 0);
+        ctx.restore();
+
+        puntosHistoria.forEach(p => {
+            const px = mapX(p.x);
+            const py = mapY(p.y);
+
+            ctx.beginPath();
+            ctx.arc(px, py, 6, 0, 2 * Math.PI);
+            ctx.fillStyle = "#fff"; 
+            ctx.fill();
+            ctx.lineWidth = 2;
+            ctx.strokeStyle = "#000";
+            ctx.stroke();
+
+            ctx.fillStyle = "#eee";
+            ctx.font = "12px monospace";
+            ctx.fillText(p.label, px + 8, py + 4);
+        });
     }
 </script>
 
