@@ -178,3 +178,37 @@ const char* clasificar_ion(int carga) {
     if (carga < 0) return "Anión";
     return "Neutro";
 }
+const char* determinar_tipo_enlace_vak(double x, double y, double mA, double mB, int ZA, int ZB, int k) {
+    
+    if (k <= 0) {
+        if (es_gas_noble_z(ZA) || es_gas_noble_z(ZB)) return "Fuerzas de Van der Waals (Inerte)";
+        return "Sin Enlace (Repulsión / Capa Cerrada)";
+    }
+
+    if (mA < 1.0 || mB < 1.0) return "Inestable (Repulsión Electrostática)";
+
+    if ((es_noble_pesado(ZA) && es_inductor_hipervalencia(ZB)) || 
+        (es_noble_pesado(ZB) && es_inductor_hipervalencia(ZA))) {
+        return "Covalente Polar (Hipervalente)";
+    }
+
+
+    if (y > 5.0) {
+        return "Iónico (Enlace Principalmente Electrostatico)";
+    }
+
+    if (y < 1.5) {
+        if (x < 6.0) {
+            return "Metálico / Aleación"; 
+        } else {
+            return "Covalente No Polar";  
+        }
+    }
+
+    
+    if (x < 6.0) {
+        return "Covalente Polar (Sólido / Red Iónica)"; 
+    } else {
+        return "Covalente Polar (Molecular)";
+    }
+}
