@@ -170,9 +170,9 @@
         `;
         
         document.getElementById('resDetalle').innerHTML = `
-            <span>Diferencia:</span> <span>${data.delta} eV</span>
-            <span>Promedio:</span>   <span>${data.promedio} eV</span>
-            <span>% Iónico:</span>   <span>${data.ic}%</span>
+            <span>Diferencia:</span> <span>${data.vak_y.toFixed(4)} eV</span>
+            <span>Promedio:</span>   <span>${data.vak_x.toFixed(4)} eV</span>
+            <span>% Iónico:</span>   <span>${data.ic.toFixed(2)}%</span>
             <span>Brazos:</span>     <span>${data.nomA}=${data.brazosA}, ${data.nomB}=${data.brazosB}</span>
         `;
     }

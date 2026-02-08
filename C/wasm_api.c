@@ -26,17 +26,18 @@ const char* calcular_enlace_wasm(const char* simbA, int eA, const char* simbB, i
 
     if (mA < 0 || mB < 0) {
         free(atA); free(atB);
-        return "{\"error\": \"Sin información en NIST para esta carga.\"}";
+        return "{\"error\": \"Sin información o carga inválida en NIST.\"}";
     }
 
-    double delta_m = fabs(mA - mB);
-    double prom_m = (mA + mB) / 2.0;
-    double ic = calcular_porcentaje_ic(delta_m);
+    double vak_y = fabs(mA - mB);       
+    double vak_x = (mA + mB) / 2.0;     
+    
+    double ic = calcular_porcentaje_ic(vak_y);
     
     int LA, LB;
     int k = calcular_multiplicidad(eA, eB, atA->Z, atB->Z, &LA, &LB);
 
-    const char* tipo = determinar_tipo_enlace_mulliken(delta_m, prom_m, mA, mB, atA->Z, atB->Z, k);
+    const char* tipo = determinar_tipo_enlace_vak(vak_x, vak_y, mA, mB, atA->Z, atB->Z, k);
     const char* k_texto = nombre_multiplicidad(k);
 
     static char resultado[2048];
@@ -44,12 +45,12 @@ const char* calcular_enlace_wasm(const char* simbA, int eA, const char* simbB, i
         "{"
         "\"nomA\": \"%s\", \"zA\": %d, \"mA\": %.4f, \"brazosA\": %d, "
         "\"nomB\": \"%s\", \"zB\": %d, \"mB\": %.4f, \"brazosB\": %d, "
-        "\"delta\": %.4f, \"promedio\": %.4f, \"ic\": %.2f, "
+        "\"vak_x\": %.4f, \"vak_y\": %.4f, \"ic\": %.2f, "
         "\"k\": %d, \"k_nom\": \"%s\", \"tipo\": \"%s\""
         "}",
         nomA, atA->Z, mA, LA,
         nomB, atB->Z, mB, LB,
-        delta_m, prom_m, ic, 
+        vak_x, vak_y, ic, 
         k, k_texto, tipo);
 
     free(atA); free(atB);
