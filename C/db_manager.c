@@ -4,9 +4,9 @@
 #include "structs.h"
 #include "cJSON.h" 
 
-#define RUTA_JSON "data/base_datos_quimica_final.json"
-#define RUTA_PAULING "data/paulling.json"
-#define RUTA_CSV "data/elementos.csv"
+#define RUTA_JSON "/data/base_datos_quimica_final.json"
+#define RUTA_PAULING "/data/paulling.json"
+#define RUTA_CSV "/data/elementos.csv"
 
 AtomoData* cargar_elemento_json(const char* simbolo_buscado) {
      

@@ -84,7 +84,7 @@ var ENVIRONMENT_IS_SHELL = !ENVIRONMENT_IS_WEB && !ENVIRONMENT_IS_NODE && !ENVIR
 
 // --pre-jses are emitted after the Module integration code, so that they can
 // refer to Module (if they choose; they can also define Module)
-// include: C:\Users\alexa\AppData\Local\Temp\tmpl0hfj6jq.js
+// include: C:\Users\alexa\AppData\Local\Temp\tmpy53q0qyo.js
 
   if (!Module['expectedDataFileDownloads']) Module['expectedDataFileDownloads'] = 0;
   Module['expectedDataFileDownloads']++;
@@ -217,21 +217,21 @@ Module['FS_createPath']("/", "data", true, true);
 
   })();
 
-// end include: C:\Users\alexa\AppData\Local\Temp\tmpl0hfj6jq.js
-// include: C:\Users\alexa\AppData\Local\Temp\tmp8rajplby.js
+// end include: C:\Users\alexa\AppData\Local\Temp\tmpy53q0qyo.js
+// include: C:\Users\alexa\AppData\Local\Temp\tmp8yui9enb.js
 
     // All the pre-js content up to here must remain later on, we need to run
     // it.
     if ((typeof ENVIRONMENT_IS_WASM_WORKER != 'undefined' && ENVIRONMENT_IS_WASM_WORKER) || (typeof ENVIRONMENT_IS_PTHREAD != 'undefined' && ENVIRONMENT_IS_PTHREAD) || (typeof ENVIRONMENT_IS_AUDIO_WORKLET != 'undefined' && ENVIRONMENT_IS_AUDIO_WORKLET)) Module['preRun'] = [];
     var necessaryPreJSTasks = Module['preRun'].slice();
-  // end include: C:\Users\alexa\AppData\Local\Temp\tmp8rajplby.js
-// include: C:\Users\alexa\AppData\Local\Temp\tmptf5um517.js
+  // end include: C:\Users\alexa\AppData\Local\Temp\tmp8yui9enb.js
+// include: C:\Users\alexa\AppData\Local\Temp\tmp_1vid294.js
 
     if (!Module['preRun']) throw 'Module.preRun should exist because file support used it; did a pre-js delete it?';
     necessaryPreJSTasks.forEach((task) => {
       if (Module['preRun'].indexOf(task) < 0) throw 'All preRun tasks that exist before user pre-js code should remain after; did you replace Module or modify Module.preRun?';
     });
-  // end include: C:\Users\alexa\AppData\Local\Temp\tmptf5um517.js
+  // end include: C:\Users\alexa\AppData\Local\Temp\tmp_1vid294.js
 
 
 var arguments_ = [];
@@ -4197,6 +4197,7 @@ var findStringEnd = (heapOrArray, idx, maxBytesToRead, ignoreNul) => {
       return (...args) => ccall(ident, returnType, argTypes, args, opts);
     };
 
+
   var FS_createPath = (...args) => FS.createPath(...args);
 
 
@@ -4266,6 +4267,7 @@ if (Module['wasmBinary']) wasmBinary = Module['wasmBinary'];
   Module['FS_unlink'] = FS_unlink;
   Module['FS_createPath'] = FS_createPath;
   Module['FS_createDevice'] = FS_createDevice;
+  Module['FS'] = FS;
   Module['FS_createDataFile'] = FS_createDataFile;
   Module['FS_createLazyFile'] = FS_createLazyFile;
   var missingLibrarySymbols = [
@@ -4533,7 +4535,6 @@ missingLibrarySymbols.forEach(missingLibrarySymbol)
   'FS_stdin_getChar_buffer',
   'FS_stdin_getChar',
   'FS_readFile',
-  'FS',
   'FS_root',
   'FS_mounts',
   'FS_devices',
