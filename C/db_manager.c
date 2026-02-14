@@ -113,35 +113,34 @@ void obtener_nombre_completo(const char *simbolo, char *nombre_dest) {
         return;
     }
 
-    char linea[256];
+    char buffer[256];
     int encontrado = 0;
-    
 
-    while (fgets(linea, sizeof(linea), fp)) {
-        char linea_copia[256];
-        strcpy(linea_copia, linea);
+    while (fgets(buffer, sizeof(buffer), fp)) {
+        buffer[strcspn(buffer, "\r\n")] = 0; 
 
-        trim(linea_copia);
-        if(strlen(linea_copia) == 0) continue; 
+        if (strlen(buffer) == 0) continue;
 
-        char *token_simbolo = strtok(linea_copia, ",");
-        char *token_nombre = strtok(NULL, ",");
+        char *coma = strchr(buffer, ',');
+        if (!coma) continue;
 
-        if (token_simbolo && token_nombre) {
-            trim(token_simbolo);
-            trim(token_nombre);
+        *coma = '\0'; 
+        char *simb_csv = buffer;
+        char *nom_csv = coma + 1;
 
-            if (strcmp(token_simbolo, simbolo) == 0) {
-                strcpy(nombre_dest, token_nombre);
-                encontrado = 1;
-                break;
-            }
+        trim(simb_csv);
+        trim(nom_csv);
+
+        if (strcmp(simb_csv, simbolo) == 0) {
+            strcpy(nombre_dest, nom_csv);
+            encontrado = 1;
+            break;
         }
     }
     fclose(fp);
 
     if (!encontrado) {
-        printf("[C WARNING] No se encontró nombre para '%s' en el CSV.\n", simbolo);
+        printf("[C WARNING] Simbolo '%s' no hallado en CSV. (Ultimo leido: '%s')\n", simbolo, buffer);
         strcpy(nombre_dest, "Desconocido");
     }
 }
