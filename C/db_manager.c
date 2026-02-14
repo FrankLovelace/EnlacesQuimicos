@@ -1,12 +1,23 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <ctype.h> 
 #include "structs.h"
 #include "cJSON.h" 
 
 #define RUTA_JSON "/data/base_datos_quimica_final.json"
 #define RUTA_PAULING "/data/paulling.json"
 #define RUTA_CSV "/data/elementos.csv"
+
+void trim(char * s) {
+    char * p = s;
+    int l = strlen(p);
+
+    while(isspace(p[l - 1])) p[--l] = 0;
+    while(* p && isspace(* p)) ++p, --l;
+
+    memmove(s, p, l + 1);
+}
 
 AtomoData* cargar_elemento_json(const char* simbolo_buscado) {
      
@@ -94,34 +105,43 @@ AtomoData* cargar_elemento_json(const char* simbolo_buscado) {
 
     return res;
 }
-
 void obtener_nombre_completo(const char *simbolo, char *nombre_dest) {
     FILE *fp = fopen(RUTA_CSV, "r");
     if (!fp) {
-        printf("[C ERROR] No se encontro %s\n", RUTA_CSV);
-        strcpy(nombre_dest, simbolo); 
+        printf("[C ERROR] CSV no encontrado: %s\n", RUTA_CSV);
+        strcpy(nombre_dest, simbolo);
         return;
     }
 
-    char linea[128];
-    while (fgets(linea, sizeof(linea), fp)) {
-        char linea_tmp[128];
-        strcpy(linea_tmp, linea);
+    char linea[256];
+    int encontrado = 0;
+    
 
-        char *token_simbolo = strtok(linea_tmp, ",");
+    while (fgets(linea, sizeof(linea), fp)) {
+        char linea_copia[256];
+        strcpy(linea_copia, linea);
+
+        trim(linea_copia);
+        if(strlen(linea_copia) == 0) continue; 
+
+        char *token_simbolo = strtok(linea_copia, ",");
         char *token_nombre = strtok(NULL, ",");
 
         if (token_simbolo && token_nombre) {
-            token_nombre[strcspn(token_nombre, "\r\n")] = 0;
+            trim(token_simbolo);
+            trim(token_nombre);
 
             if (strcmp(token_simbolo, simbolo) == 0) {
                 strcpy(nombre_dest, token_nombre);
-                fclose(fp);
-                return;
+                encontrado = 1;
+                break;
             }
         }
     }
-
-    strcpy(nombre_dest, "Desconocido");
     fclose(fp);
+
+    if (!encontrado) {
+        printf("[C WARNING] No se encontró nombre para '%s' en el CSV.\n", simbolo);
+        strcpy(nombre_dest, "Desconocido");
+    }
 }
