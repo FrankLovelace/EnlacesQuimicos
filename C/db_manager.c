@@ -7,20 +7,40 @@
 
 #define RUTA_JSON "/data/base_datos_quimica_final.json"
 #define RUTA_PAULING "/data/paulling.json"
-#define RUTA_CSV "/data/elementos.csv"
+
+typedef struct {
+    const char* simbolo;
+    const char* nombre;
+} ElementoNombre;
+
+const ElementoNombre TABLA_NOMBRES[] = {
+    {"H", "Hidrógeno"}, {"He", "Helio"}, {"Li", "Litio"}, {"Be", "Berilio"}, {"B", "Boro"}, {"C", "Carbono"}, {"N", "Nitrógeno"}, {"O", "Oxígeno"}, {"F", "Flúor"}, {"Ne", "Neón"},
+    {"Na", "Sodio"}, {"Mg", "Magnesio"}, {"Al", "Aluminio"}, {"Si", "Silicio"}, {"P", "Fósforo"}, {"S", "Azufre"}, {"Cl", "Cloro"}, {"Ar", "Argón"}, {"K", "Potasio"}, {"Ca", "Calcio"},
+    {"Sc", "Escandio"}, {"Ti", "Titanio"}, {"V", "Vanadio"}, {"Cr", "Cromo"}, {"Mn", "Manganeso"}, {"Fe", "Hierro"}, {"Co", "Cobalto"}, {"Ni", "Níquel"}, {"Cu", "Cobre"}, {"Zn", "Zinc"},
+    {"Ga", "Galio"}, {"Ge", "Germanio"}, {"As", "Arsénico"}, {"Se", "Selenio"}, {"Br", "Bromo"}, {"Kr", "Kriptón"}, {"Rb", "Rubidio"}, {"Sr", "Estroncio"}, {"Y", "Itrio"}, {"Zr", "Circonio"},
+    {"Nb", "Niobio"}, {"Mo", "Molibdeno"}, {"Tc", "Tecnecio"}, {"Ru", "Rutenio"}, {"Rh", "Rodio"}, {"Pd", "Paladio"}, {"Ag", "Plata"}, {"Cd", "Cadmio"}, {"In", "Indio"}, {"Sn", "Estaño"},
+    {"Sb", "Antimonio"}, {"Te", "Telurio"}, {"I", "Yodo"}, {"Xe", "Xenón"}, {"Cs", "Cesio"}, {"Ba", "Bario"}, {"La", "Lantano"}, {"Ce", "Cerio"}, {"Pr", "Praseodimio"}, {"Nd", "Neodimio"},
+    {"Pm", "Prometio"}, {"Sm", "Samario"}, {"Eu", "Europio"}, {"Gd", "Gadolinio"}, {"Tb", "Terbio"}, {"Dy", "Disprosio"}, {"Ho", "Holmio"}, {"Er", "Erbio"}, {"Tm", "Tulio"}, {"Yb", "Iterbio"},
+    {"Lu", "Lutecio"}, {"Hf", "Hafnio"}, {"Ta", "Tántalo"}, {"W", "Wolframio"}, {"Re", "Renio"}, {"Os", "Osmio"}, {"Ir", "Iridio"}, {"Pt", "Platino"}, {"Au", "Oro"}, {"Hg", "Mercurio"},
+    {"Tl", "Talio"}, {"Pb", "Plomo"}, {"Bi", "Bismuto"}, {"Po", "Polonio"}, {"At", "Astato"}, {"Rn", "Radón"}, {"Fr", "Francio"}, {"Ra", "Radio"}, {"Ac", "Actinio"}, {"Th", "Torio"},
+    {"Pa", "Protactinio"}, {"U", "Uranio"}, {"Np", "Neptunio"}, {"Pu", "Plutonio"}, {"Am", "Americio"}, {"Cm", "Curio"}, {"Bk", "Berkelio"}, {"Cf", "Californio"}, {"Es", "Einstenio"}, {"Fm", "Fermio"},
+    {"Md", "Mendelevio"}, {"No", "Nobelio"}, {"Lr", "Laurencio"}, {"Rf", "Rutherfordio"}, {"Db", "Dubnio"}, {"Sg", "Seaborgio"}, {"Bh", "Bohrio"}, {"Hs", "Hassio"}, {"Mt", "Meitnerio"}, {"Ds", "Darmstatio"},
+    {"Rg", "Roentgenio"}, {"Cn", "Copernicio"}, {"Nh", "Nihonio"}, {"Fl", "Flerovio"}, {"Mc", "Moscovio"}, {"Lv", "Livermorio"}, {"Ts", "Teneso"}, {"Og", "Oganesón"},
+    {NULL, NULL}
+};
+
 
 void trim(char * s) {
+    if (!s) return;
     char * p = s;
     int l = strlen(p);
-
-    while(isspace(p[l - 1])) p[--l] = 0;
+    while(l > 0 && isspace(p[l - 1])) p[--l] = 0;
     while(* p && isspace(* p)) ++p, --l;
-
     memmove(s, p, l + 1);
 }
 
+
 AtomoData* cargar_elemento_json(const char* simbolo_buscado) {
-     
     FILE *fp = fopen(RUTA_JSON, "r");
     if (!fp) {
         printf("[C ERROR] No se pudo abrir %s\n", RUTA_JSON);
@@ -61,18 +81,24 @@ AtomoData* cargar_elemento_json(const char* simbolo_buscado) {
     if (estados) {
         cJSON *estado = NULL;
         int contador = 0;
-        
         cJSON_ArrayForEach(estado, estados) {
             int c = atoi(estado->string); 
-            
             if (c >= 0 && c < 120) {
                 res->estados[c].carga = c;
-                res->estados[c].mulliken_ev = cJSON_GetObjectItemCaseSensitive(estado, "mulliken_ev")->valuedouble;
-                
+                cJSON *mulliken = cJSON_GetObjectItemCaseSensitive(estado, "mulliken_ev");
+                if (mulliken) {
+                    res->estados[c].mulliken_ev = mulliken->valuedouble;
+                } else {
+                    res->estados[c].mulliken_ev = 0.0;
+                }
                 res->tiene_datos_carga[c] = 1;
-                
                 if (c == 0) {
-                    res->afinidad_neutra = cJSON_GetObjectItemCaseSensitive(estado, "ea_ev")->valuedouble;
+                    cJSON *ea = cJSON_GetObjectItemCaseSensitive(estado, "ea_ev");
+                    if (ea) {
+                        res->afinidad_neutra = ea->valuedouble;
+                    } else {
+                        res->afinidad_neutra = 0.0;
+                    }
                 }
                 contador++;
             }
@@ -94,53 +120,24 @@ AtomoData* cargar_elemento_json(const char* simbolo_buscado) {
         buffer_p[size_p] = '\0';
 
         cJSON *json_p = cJSON_Parse(buffer_p);
-        cJSON *val_p = cJSON_GetObjectItemCaseSensitive(json_p, simbolo_buscado);
-        
-        if (val_p) res->pauling_referencia = val_p->valuedouble;
-        else res->pauling_referencia = 0.0;
-        
+        if (json_p) {
+            cJSON *val_p = cJSON_GetObjectItemCaseSensitive(json_p, simbolo_buscado);
+            if (val_p) res->pauling_referencia = val_p->valuedouble;
+            else res->pauling_referencia = 0.0;
+            cJSON_Delete(json_p);
+        }
         free(buffer_p);
-        cJSON_Delete(json_p);
     }
 
     return res;
 }
+
 void obtener_nombre_completo(const char *simbolo, char *nombre_dest) {
-    FILE *fp = fopen(RUTA_CSV, "r");
-    if (!fp) {
-        printf("[C ERROR] CSV no encontrado: %s\n", RUTA_CSV);
-        strcpy(nombre_dest, simbolo);
-        return;
-    }
-
-    char buffer[256];
-    int encontrado = 0;
-
-    while (fgets(buffer, sizeof(buffer), fp)) {
-        buffer[strcspn(buffer, "\r\n")] = 0; 
-
-        if (strlen(buffer) == 0) continue;
-
-        char *coma = strchr(buffer, ',');
-        if (!coma) continue;
-
-        *coma = '\0'; 
-        char *simb_csv = buffer;
-        char *nom_csv = coma + 1;
-
-        trim(simb_csv);
-        trim(nom_csv);
-
-        if (strcmp(simb_csv, simbolo) == 0) {
-            strcpy(nombre_dest, nom_csv);
-            encontrado = 1;
-            break;
+    for (int i = 0; TABLA_NOMBRES[i].simbolo != NULL; i++) {
+        if (strcmp(TABLA_NOMBRES[i].simbolo, simbolo) == 0) {
+            strcpy(nombre_dest, TABLA_NOMBRES[i].nombre);
+            return;
         }
     }
-    fclose(fp);
-
-    if (!encontrado) {
-        printf("[C WARNING] Simbolo '%s' no hallado en CSV. (Ultimo leido: '%s')\n", simbolo, buffer);
-        strcpy(nombre_dest, "Desconocido");
-    }
+    strcpy(nombre_dest, simbolo);
 }
